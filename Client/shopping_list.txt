@@ -1,0 +1,5 @@
+Gruszki;4.5;Fruits;kg
+Schab;1.0;Meat;kg
+Kurczak;2.0;Meat;kg
+Chleb;1;Bread;szt
+Bulki;3;Bread;szt
