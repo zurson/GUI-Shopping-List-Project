@@ -1,5 +1,9 @@
-import java.io.*;
-import java.net.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.OutputStreamWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 public class Server {
     private static final int SERVER_PORT = 12345;
@@ -43,7 +47,7 @@ public class Server {
                 if (!isClientConnected()) {
                     clientConnected();
 
-                    output.write("Miejsce dostępne");
+                    output.write("OK");
                     output.newLine();
                     output.flush();
 
@@ -64,16 +68,16 @@ public class Server {
                     clientDisconnected();
                 }
                 else {
-                    output.write("Brak dostępnego miejsca");
+                    output.write("Server is full!");
                     output.newLine();
                     output.flush();
                     socket.close();
-                    System.out.println("Zakończono połączenie: " + socket + "\n\n\n");
+                    System.out.println("Ending connection: " + socket + "\n\n\n");
                     return;
                 }
 
                 socket.close();
-                System.out.println("Zakończono połączenie: " + socket + "\n\n\n");
+                System.out.println("Ending connection: " + socket + "\n\n\n");
                 clientDisconnected();
 
             }
