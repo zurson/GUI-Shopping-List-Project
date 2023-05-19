@@ -7,17 +7,18 @@ public class Client {
 
     public static void main(String[] args) {
         while (true) {
-            try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT)) {
+            try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                 ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream())) {
 
                 System.out.println("\nConnected to the server!");
 
                 // Sprawdzenie dostępności miejsca
-                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
                 String response = reader.readLine();
                 System.out.println("Odpowiedź serwera: " + response);
 
                 if (response.equalsIgnoreCase("Miejsce dostępne")) {
-                    ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 
                     String listOfProducts = "test message xd";
 
