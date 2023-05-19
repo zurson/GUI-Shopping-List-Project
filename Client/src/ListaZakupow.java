@@ -8,7 +8,7 @@ public class ListaZakupow extends JFrame {
 
     private final String FRAME_NAME = "Shopping List";
     private final String[] UNITS_LIST = {"szt", "kg", "litr"};
-    private final String[] CATEGORIES_LIST = { null, "Bread", "Meat", "Fruits", "Vegetables", "Sweets", "Drinks", "Chemicals"};
+    private final String[] CATEGORIES_LIST = {null, "Bread", "Meat", "Fruits", "Vegetables", "Sweets", "Drinks", "Chemicals"};
 
     private ArrayList<Product> allProductsList;
     private DefaultListModel<Product> displayedProductsList;
@@ -71,37 +71,34 @@ public class ListaZakupow extends JFrame {
 
     }
 
-    public void showList(){
-//        addExampleProducts();
+    public void showList() {
         loadDataFromFile();
         showProgramWindow();
     }
 
-
-//    public void addExampleProducts() {
-//
-//        addNewProduct(new Product("Jabłka", "2.5", "Fruits", "kg"));
-//        addNewProduct(new Product("Gruszki", "1.5", "Fruits", "kg"));
-//        addNewProduct(new Product("Pomarańcze", "3.0", "Fruits", "kg"));
-//        addNewProduct(new Product("Chleb", "1", "Bread", "szt"));
-//        addNewProduct(new Product("Bułki", "4", "Bread", "szt"));
-//        addNewProduct(new Product("Rogale", "6", "Bread", "szt"));
-//        addNewProduct(new Product("Domestos", "1", "Chemicals", "litr"));
-//        addNewProduct(new Product("Mydło", "1", "Chemicals", "szt"));
-//        addNewProduct(new Product("Pasta do zębów", "2", "Chemicals", "szt"));
-//    }
+    public void fillList(ArrayList<Product> list) {
+        for (Product product : list)
+            addNewProduct(product);
+    }
 
 
+    private void showProgramWindow() {
+        setVisible(true);
+    }
 
-    private void showProgramWindow() { setVisible(true); }
-    private JButton createNewButton(String name){
+    private JButton createNewButton(String name) {
         return new JButton(name);
     }
-    private void initializeErrorManager(){
+
+    private void initializeErrorManager() {
         new InfoBox(ListaZakupow.this);
     }
-    private void addButtonToPanel(JPanel panel, JButton button) { panel.add(button); }
-    private void loadDataFromFile(){
+
+    private void addButtonToPanel(JPanel panel, JButton button) {
+        panel.add(button);
+    }
+
+    private void loadDataFromFile() {
 
         allProductsList = FileManager.readFile();
 
@@ -114,7 +111,7 @@ public class ListaZakupow extends JFrame {
     }
 
 
-    private void setFrameBasicFeatures(){
+    private void setFrameBasicFeatures() {
         setTitle(FRAME_NAME);
 
 
@@ -124,7 +121,7 @@ public class ListaZakupow extends JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
 
-                if (changesAreSaved == false){
+                if (changesAreSaved == false) {
 
                     int confirm = JOptionPane.showConfirmDialog(ListaZakupow.this,
                             "There are unsaved changes!\nDo you want do save it?",
@@ -139,8 +136,7 @@ public class ListaZakupow extends JFrame {
 
                     dispose();
 
-                }
-                else
+                } else
                     dispose();
 
             }
@@ -150,25 +146,25 @@ public class ListaZakupow extends JFrame {
         setSize(600, 600);
     }
 
-    private void initializeLists(){
+    private void initializeLists() {
         allProductsList = new ArrayList<>();
         displayedProductsList = new DefaultListModel<>();
     }
 
-    private JPanel initializeMainPanel(){
+    private JPanel initializeMainPanel() {
         JPanel mainPanel = new JPanel(new BorderLayout());
         add(mainPanel);
         return mainPanel;
     }
 
-    private JPanel createNewProductPanel(JPanel mainPanel){
+    private JPanel createNewProductPanel(JPanel mainPanel) {
         JPanel addProductPanel = new JPanel(new GridLayout(0, 2, 5, 5));
         addProductPanel.setBorder(BorderFactory.createTitledBorder("Add Product"));
         mainPanel.add(addProductPanel, BorderLayout.NORTH);
         return addProductPanel;
     }
 
-    private void createProductsListPanel(JPanel mainPanel){
+    private void createProductsListPanel(JPanel mainPanel) {
 
         JPanel produktyPanel = new JPanel(new BorderLayout());
         produktyPanel.setBorder(BorderFactory.createTitledBorder("List of products"));
@@ -181,7 +177,7 @@ public class ListaZakupow extends JFrame {
 
     }
 
-    private void createNameField(JPanel panel){
+    private void createNameField(JPanel panel) {
         JLabel productNameLabel = new JLabel("Name:");
         panel.add(productNameLabel);
 
@@ -189,7 +185,7 @@ public class ListaZakupow extends JFrame {
         panel.add(productNameField);
     }
 
-    private void createAmountField(JPanel panel){
+    private void createAmountField(JPanel panel) {
         JLabel amountLabel = new JLabel("Amount:");
         panel.add(amountLabel);
 
@@ -203,7 +199,7 @@ public class ListaZakupow extends JFrame {
         amountPanel.add(unitsComboBox);
     }
 
-    private void createCategoriesField(JPanel panel){
+    private void createCategoriesField(JPanel panel) {
         JLabel categoriesLabel = new JLabel("Category:");
         panel.add(categoriesLabel);
 
@@ -211,7 +207,7 @@ public class ListaZakupow extends JFrame {
         panel.add(categoriesComboBox);
     }
 
-    private void createOperationsPanel(JPanel mainPanel){
+    private void createOperationsPanel(JPanel mainPanel) {
 
         operationsPanel = new JPanel(new GridLayout(0, 1, 5, 5));
         operationsPanel.setBorder(BorderFactory.createTitledBorder("Available Operations"));
@@ -220,11 +216,16 @@ public class ListaZakupow extends JFrame {
     }
 
 
-    private void newChangesAppeared() { changesAreSaved = false; }
-    private void changesHaveBeenSaved() { changesAreSaved = true; }
+    private void newChangesAppeared() {
+        changesAreSaved = false;
+    }
+
+    private void changesHaveBeenSaved() {
+        changesAreSaved = true;
+    }
 
 
-    private String getNewProductName(){
+    private String getNewProductName() {
         String name = productNameField.getText();
         if (name.isEmpty()) {
             InfoBox.error("Enter product name!");
@@ -234,9 +235,9 @@ public class ListaZakupow extends JFrame {
         return name;
     }
 
-    private String getCategory(){
+    private String getCategory() {
         String category = (String) categoriesComboBox.getSelectedItem();
-        if (category == null){
+        if (category == null) {
             InfoBox.error("Choose category!");
             return null;
         }
@@ -244,9 +245,9 @@ public class ListaZakupow extends JFrame {
         return category;
     }
 
-    private String getUnit(){
+    private String getUnit() {
         String unit = (String) unitsComboBox.getSelectedItem();
-        if (unit == null || unit.isEmpty()){
+        if (unit == null || unit.isEmpty()) {
             InfoBox.error("Choose unit!");
             return null;
         }
@@ -254,7 +255,7 @@ public class ListaZakupow extends JFrame {
         return unit;
     }
 
-    private String getAmount(String unit){
+    private String getAmount(String unit) {
 
         int amountInt = 0;
         double amountDouble = 0;
@@ -264,13 +265,12 @@ public class ListaZakupow extends JFrame {
                 amountInt = Integer.parseInt(amountField.getText());
             else
                 amountDouble = Double.parseDouble(amountField.getText());
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             InfoBox.error("This is not a correct value!");
             return null;
         }
 
-        if (amountDouble + amountInt <= 0){
+        if (amountDouble + amountInt <= 0) {
             InfoBox.error("Product amount is too small!");
             return null;
         }
@@ -278,19 +278,19 @@ public class ListaZakupow extends JFrame {
         return amountInt != 0 ? String.valueOf(amountInt) : String.valueOf(amountDouble);
     }
 
-    private void clearTextFields(){
+    private void clearTextFields() {
         productNameField.setText("");
         amountField.setText("");
     }
 
-    private void addNewProduct(Product product){
+    private void addNewProduct(Product product) {
         allProductsList.add(product);
         displayedProductsList.addElement(product);
         newChangesAppeared();
     }
 
 
-    private void handleConfirmButton(JButton confirmButton){
+    private void handleConfirmButton(JButton confirmButton) {
 
         confirmButton.addActionListener(e -> {
 
@@ -313,7 +313,7 @@ public class ListaZakupow extends JFrame {
 
     }
 
-    private void handleDeleteSelectedButton(JButton deleteSelectedButton){
+    private void handleDeleteSelectedButton(JButton deleteSelectedButton) {
 
         deleteSelectedButton.addActionListener(e -> {
             int selectedIndex = listToSelectProduct.getSelectedIndex();
@@ -330,13 +330,13 @@ public class ListaZakupow extends JFrame {
 
     }
 
-    private void handleDeleteCategoryButton(JButton deleteCategoryButton){
+    private void handleDeleteCategoryButton(JButton deleteCategoryButton) {
 
         deleteCategoryButton.addActionListener(e -> {
 
             String selectedCategory = (String) JOptionPane.showInputDialog(ListaZakupow.this, "Choose category you want to delete:", "Delete Category", JOptionPane.PLAIN_MESSAGE, null, CATEGORIES_LIST, CATEGORIES_LIST[0]);
 
-            if (selectedCategory == null){
+            if (selectedCategory == null) {
                 InfoBox.error("Select a category!");
                 return;
             }
@@ -350,7 +350,7 @@ public class ListaZakupow extends JFrame {
 
     }
 
-    private void handleDeleteAllProductsButton(JButton deleteAllProductsButton){
+    private void handleDeleteAllProductsButton(JButton deleteAllProductsButton) {
 
         deleteAllProductsButton.addActionListener(e -> {
             allProductsList.clear();
@@ -360,7 +360,7 @@ public class ListaZakupow extends JFrame {
 
     }
 
-    private void handleFilterButton(JButton filterButton){
+    private void handleFilterButton(JButton filterButton) {
 
         filterButton.addActionListener(e -> {
 
@@ -374,12 +374,11 @@ public class ListaZakupow extends JFrame {
             if (selectedCategory != null) {
 
                 displayedProductsList.clear();
-                if (selectedCategory.equals("Show All Products")){
-                    for(Product product : allProductsList){
+                if (selectedCategory.equals("Show All Products")) {
+                    for (Product product : allProductsList) {
                         displayedProductsList.addElement(product);
                     }
-                }
-                else
+                } else
                     allProductsList.stream().filter(produkt -> produkt.getCategory().equals(selectedCategory)).forEach(produkt -> displayedProductsList.addElement(produkt));
 
             }
@@ -387,7 +386,7 @@ public class ListaZakupow extends JFrame {
 
     }
 
-    private void handleSaveButton(JButton saveButton){
+    private void handleSaveButton(JButton saveButton) {
 
         saveButton.addActionListener(e -> {
 

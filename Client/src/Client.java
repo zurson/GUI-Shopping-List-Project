@@ -1,58 +1,114 @@
+import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.io.*;
-import java.net.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 public class Client {
-    private static final String SERVER_ADDRESS = "localhost";
-    private static final int SERVER_PORT = 12345;
 
-    public static void main(String[] args) {
+    private String host;
+    private int port;
+    private static final int retryTime = 5;
+
+    Socket socket;
+
+
+    public Client(String host, int port) {
+        this.port = port;
+        this.host = host;
+
+        connectToTheServer();
+    }
+
+    private void connectToTheServer() {
+
         while (true) {
-            try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
-                 BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                 ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream())) {
+
+            try {
+
+                socket = new Socket(host, port);
+                break;
+
+            } catch (IOException e) {
+                try {
+                    retryConnection("Server not responding. Retrying in " + retryTime + " seconds.", retryTime);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                    return;
+                }
+            }
+
+        }
+
+
+        while (true) {
+
+            System.out.println("TRY TO CONNECT");
+
+            try (BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream())) {
 
                 System.out.println("\nConnected to the server!");
 
                 // Sprawdzenie dostępności miejsca
 
-                String response = reader.readLine();
-                System.out.println("Odpowiedź serwera: " + response);
+                if (hasServerFreeSlot(input)) {
 
-                if (response.equalsIgnoreCase("Miejsce dostępne")) {
+                    ArrayList<Product> listFromServer = (ArrayList<Product>) objectInputStream.readObject();
 
-                    String listOfProducts = "test message xd";
+                    ListaZakupow listaZakupow = new ListaZakupow();
+                    listaZakupow.fillList(listFromServer);
+                    listaZakupow.showList();
 
-                    Thread.sleep(10000);
-                    output.writeObject(listOfProducts);
-                    output.flush();
 
-                    System.out.println("Wysłano obiekt ListOfProducts do serwera.");
+                    Product product = new Product("Chujew", "1", "Meat", "kg");
+                    Product product2 = new Product("Chujewyxd", "1", "Meat", "kg");
 
-                    // Oczekiwanie na potwierdzenie z serwera (opcjonalne)
-                    response = reader.readLine();
+                    ArrayList<Product> list = new ArrayList<>();
+                    list.add(product);
+                    list.add(product2);
+
+                    objectOutputStream.writeObject(list);
+                    objectOutputStream.flush();
+
+//                  Oczekiwanie na potwierdzenie z serwera
+                    String response = input.readLine();
                     System.out.println("Odpowiedź serwera: " + response);
 
-                    break; // Wyjście z pętli, jeśli komunikacja z serwerem przebiegła pomyślnie
+                    break; // Exit loop
+
                 } else {
-                    System.out.println("Brak dostępnego miejsca. Ponawianie próby za 5 sekund...");
+
                     try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
+                        retryConnection("Server is full. Retrying in " + retryTime + " seconds.", retryTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                         break;
                     }
+
                 }
+
             } catch (IOException e) {
-                System.out.println("Nie można połączyć się z serwerem. Ponawianie próby za 5 sekund...");
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                    break;
-                }
-            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
+
+    }
+
+
+    private boolean hasServerFreeSlot(BufferedReader input) throws IOException {
+
+        String status = input.readLine();
+        System.out.println("STATUS: " + status);
+
+        return status.equalsIgnoreCase("OK");
+    }
+
+    public void retryConnection(String message, int time) throws InterruptedException {
+        System.out.println(message);
+        Thread.sleep(time * 1000);
     }
 }
