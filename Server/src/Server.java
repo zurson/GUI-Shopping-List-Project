@@ -37,15 +37,15 @@ public class Server {
 
         @Override
         public void run() {
-            try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            try(BufferedWriter output = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                 ObjectInputStream input = new ObjectInputStream(socket.getInputStream())) {
 
                 if (!isClientConnected()) {
                     clientConnected();
 
-                    writer.write("Miejsce dostępne");
-                    writer.newLine();
-                    writer.flush();
+                    output.write("Miejsce dostępne");
+                    output.newLine();
+                    output.flush();
 
                     Object object = input.readObject();
 
@@ -57,16 +57,16 @@ public class Server {
                     }
 
                     // Opcjonalna odpowiedź do klienta
-                    writer.write("Odebrano obiekt ListOfProducts. Dziękujemy!");
-                    writer.newLine();
-                    writer.flush();
+                    output.write("Odebrano obiekt ListOfProducts. Dziękujemy!");
+                    output.newLine();
+                    output.flush();
 
                     clientDisconnected();
                 }
                 else {
-                    writer.write("Brak dostępnego miejsca");
-                    writer.newLine();
-                    writer.flush();
+                    output.write("Brak dostępnego miejsca");
+                    output.newLine();
+                    output.flush();
                     socket.close();
                     System.out.println("Zakończono połączenie: " + socket + "\n\n\n");
                     return;
