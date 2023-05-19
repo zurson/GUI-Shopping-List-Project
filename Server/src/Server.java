@@ -42,6 +42,8 @@ public class Server {
 //                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
                 if (!isClientConnected()) {
+                    clientConnected();
+
                     writer.write("Miejsce dostępne");
                     writer.newLine();
                     writer.flush();
@@ -63,6 +65,8 @@ public class Server {
                     writer.write("Odebrano obiekt ListOfProducts. Dziękujemy!");
                     writer.newLine();
                     writer.flush();
+
+                    clientDisconnected();
                 }
                 else {
                     writer.write("Brak dostępnego miejsca");
@@ -77,7 +81,10 @@ public class Server {
                 System.out.println("Zakończono połączenie: " + socket + "\n\n\n");
                 clientDisconnected();
             }
-            catch (IOException | ClassNotFoundException e) { e.printStackTrace(); clientDisconnected(); }
+            catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                clientDisconnected();
+            }
         }
     }
 

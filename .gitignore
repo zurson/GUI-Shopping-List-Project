@@ -1,2 +1,6 @@
 Client/.idea
+Client/out
+Client/Client.iml
+
 Server/.idea
+Server/out
