@@ -4,7 +4,7 @@ import java.net.*;
 public class Server {
     private static final int SERVER_PORT = 12345;
     private static boolean isCLientConntected = false;
-    private static boolean isCheckerWorking = false;
+
 
     public static void main(String[] args) {
 
@@ -39,7 +39,6 @@ public class Server {
         public void run() {
             try {
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-//                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
                 if (!isClientConnected()) {
                     clientConnected();
@@ -47,9 +46,6 @@ public class Server {
                     writer.write("Miejsce dostępne");
                     writer.newLine();
                     writer.flush();
-
-                    Thread checkerThread = new Thread(new ConnectonChecker(socket));
-                    checkerThread.start();
 
                     ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
                     Object object = input.readObject();
@@ -80,6 +76,7 @@ public class Server {
                 socket.close();
                 System.out.println("Zakończono połączenie: " + socket + "\n\n\n");
                 clientDisconnected();
+
             }
             catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
@@ -88,35 +85,4 @@ public class Server {
         }
     }
 
-
-    private static class ConnectonChecker implements Runnable{
-
-        private final Socket socket;
-
-        public ConnectonChecker(Socket socket) {
-            this.socket = socket;
-            isCheckerWorking = true;
-        }
-
-        @Override
-        public void run() {
-
-            while(true){
-
-                if(!socket.isConnected()){
-                    clientDisconnected();
-                    isCheckerWorking = false;
-                    System.out.println(" *** UTRACONO POLACZENIE ***");
-                    return;
-                }
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-        }
-    }
 }
