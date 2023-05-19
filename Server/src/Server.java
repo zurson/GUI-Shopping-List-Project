@@ -37,8 +37,8 @@ public class Server {
 
         @Override
         public void run() {
-            try {
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+                ObjectInputStream input = new ObjectInputStream(socket.getInputStream())) {
 
                 if (!isClientConnected()) {
                     clientConnected();
@@ -47,7 +47,6 @@ public class Server {
                     writer.newLine();
                     writer.flush();
 
-                    ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
                     Object object = input.readObject();
 
                     if (object instanceof String) {
