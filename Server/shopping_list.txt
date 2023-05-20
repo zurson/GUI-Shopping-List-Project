@@ -16,3 +16,4 @@ Glowka kapusty;1;Vegetables;szt
 Bulki;3;Bread;szt
 Bagietka czosnkowa;1;Bread;szt
 Chleb razowy;1;Bread;szt
+Marchewki;6;Vegetables;szt

@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -26,6 +27,8 @@ public class ListaZakupow extends JFrame {
     private JComboBox<String> categoriesComboBox;
 
     private ObjectOutputStream objectOutputStream;
+
+
 
     public ListaZakupow(ObjectOutputStream objectOutputStream) {
 
@@ -62,7 +65,7 @@ public class ListaZakupow extends JFrame {
         addButtonToPanel(operationsPanel, deleteCategoryButton);
         handleDeleteCategoryButton(deleteCategoryButton);
 
-        JButton deleteAllProductsButton = new JButton("Delete All Products");
+        JButton deleteAllProductsButton = createNewButton("Delete All Products");
         addButtonToPanel(operationsPanel, deleteAllProductsButton);
         handleDeleteAllProductsButton(deleteAllProductsButton);
 
@@ -74,7 +77,11 @@ public class ListaZakupow extends JFrame {
         addButtonToPanel(operationsPanel, saveButton);
         handleSaveButton(saveButton);
 
+        operationsPanel.setBackground(Color.lightGray);
+
     }
+
+
 
     public void showList() {
         showProgramWindow();
@@ -105,7 +112,13 @@ public class ListaZakupow extends JFrame {
     }
 
     private JButton createNewButton(String name) {
-        return new JButton(name);
+
+        JButton button = new JButton(name);
+        button.setBackground(Color.DARK_GRAY);
+        button.setFont(new Font("Italic", Font.BOLD, 15));
+        button.setForeground(Color.white);
+
+        return button;
     }
 
     private void initializeErrorManager() {
@@ -174,7 +187,7 @@ public class ListaZakupow extends JFrame {
         });
 
 
-        setSize(600, 600);
+        setSize(400, 600);
     }
 
 
@@ -190,7 +203,8 @@ public class ListaZakupow extends JFrame {
     }
 
     private JPanel createNewProductPanel(JPanel mainPanel) {
-        JPanel addProductPanel = new JPanel(new GridLayout(0, 2, 5, 5));
+        JPanel addProductPanel = new JPanel(new GridLayout(0, 2, 3, 5));
+        addProductPanel.setBackground(Color.LIGHT_GRAY);
         addProductPanel.setBorder(BorderFactory.createTitledBorder("Add Product"));
         mainPanel.add(addProductPanel, BorderLayout.NORTH);
         return addProductPanel;
@@ -199,43 +213,55 @@ public class ListaZakupow extends JFrame {
     private void createProductsListPanel(JPanel mainPanel) {
 
         JPanel produktyPanel = new JPanel(new BorderLayout());
+        produktyPanel.setBackground(Color.LIGHT_GRAY);
         produktyPanel.setBorder(BorderFactory.createTitledBorder("List of products"));
 
         mainPanel.add(produktyPanel, BorderLayout.CENTER);
 
         listToSelectProduct = new JList<>(displayedProductsList);
         listToSelectProduct.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        listToSelectProduct.setBackground(Color.WHITE);
+        listToSelectProduct.setForeground(Color.BLACK);
         produktyPanel.add(new JScrollPane(listToSelectProduct), BorderLayout.CENTER);
 
     }
 
     private void createNameField(JPanel panel) {
         JLabel productNameLabel = new JLabel("Name:");
+        productNameLabel.setFont(new Font("Arial", Font.BOLD, 14));
         panel.add(productNameLabel);
 
         productNameField = new JTextField();
+        productNameField.setFont(new Font("Airal", Font.PLAIN, 15));
         panel.add(productNameField);
     }
 
     private void createAmountField(JPanel panel) {
         JLabel amountLabel = new JLabel("Amount:");
+        amountLabel.setFont(new Font("Arial", Font.BOLD, 14));
         panel.add(amountLabel);
 
         JPanel amountPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        amountPanel.setBackground(Color.LIGHT_GRAY);
         panel.add(amountPanel);
 
         amountField = new JTextField(5);
+        amountField.setPreferredSize(new Dimension(20,28));
+        amountField.setFont(new Font("Arial", Font.PLAIN, 15));
         amountPanel.add(amountField);
 
         unitsComboBox = new JComboBox<>(UNITS_LIST);
+        unitsComboBox.setFont(new Font("Arial", Font.BOLD, 14));
         amountPanel.add(unitsComboBox);
     }
 
     private void createCategoriesField(JPanel panel) {
         JLabel categoriesLabel = new JLabel("Category:");
+        categoriesLabel.setFont(new Font("Arial", Font.BOLD, 14));
         panel.add(categoriesLabel);
 
         categoriesComboBox = new JComboBox<>(CATEGORIES_LIST);
+        categoriesComboBox.setFont(new Font("Arial", Font.PLAIN, 15));
         panel.add(categoriesComboBox);
     }
 
