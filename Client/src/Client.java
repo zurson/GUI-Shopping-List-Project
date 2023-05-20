@@ -6,16 +6,17 @@ import java.util.ArrayList;
 
 public class Client {
 
-    private String host;
-    private int port;
-    private static final int retryTime = 5;
-
-    Socket socket;
-
+    private final String host;
+    private final int port;
+    private final int retryTime = 5;
+    private final boolean isDebugActive = true;
+    Debug debug;
+    ListaZakupow listaZakupow;
 
     public Client(String host, int port) {
         this.port = port;
         this.host = host;
+        this.debug = new Debug(isDebugActive);
 
         connectToTheServer();
     }
@@ -24,53 +25,25 @@ public class Client {
 
         while (true) {
 
-            try {
+            try (Socket socket = new Socket(host, port);
+                 BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                 ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream())) {
 
-                socket = new Socket(host, port);
-                break;
-
-            } catch (IOException e) {
-                try {
-                    retryConnection("Server not responding. Retrying in " + retryTime + " seconds.", retryTime);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                    return;
-                }
-            }
-
-        }
-
-
-        while (true) {
-
-            System.out.println("TRY TO CONNECT");
-
-            try (BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream())) {
 
                 System.out.println("\nConnected to the server!");
 
-                // Sprawdzenie dostępności miejsca
+//                 Sprawdzenie dostępności miejsca
 
                 if (hasServerFreeSlot(input)) {
 
+                    debug.message("Waiting for a list from server");
                     ArrayList<Product> listFromServer = (ArrayList<Product>) objectInputStream.readObject();
+                    debug.message("List has arrived");
 
-                    ListaZakupow listaZakupow = new ListaZakupow();
-                    listaZakupow.fillList(listFromServer);
-                    listaZakupow.showList();
-
-
-                    Product product = new Product("Chujew", "1", "Meat", "kg");
-                    Product product2 = new Product("Chujewyxd", "1", "Meat", "kg");
-
-                    ArrayList<Product> list = new ArrayList<>();
-                    list.add(product);
-                    list.add(product2);
-
-                    objectOutputStream.writeObject(list);
-                    objectOutputStream.flush();
+                    debug.message("Opening GUI");
+                    openGUI(listFromServer, objectOutputStream);
+                    debug.message("GUI opened");
 
 //                  Oczekiwanie na potwierdzenie z serwera
                     String response = input.readLine();
@@ -89,20 +62,46 @@ public class Client {
 
                 }
 
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
+            } catch (IOException e) {
+                emergencyListClose();
+
+                try {
+                    retryConnection("Server not responding. Retrying in " + retryTime + " seconds.", retryTime);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                    return;
+                }
             }
+
         }
 
     }
 
 
+    private void emergencyListClose() {
+        if (listaZakupow != null) {
+            listaZakupow.emergencyClose();
+            listaZakupow = null;
+        }
+    }
+
+    private void openGUI(ArrayList<Product> list, ObjectOutputStream objectOutputStream) {
+        listaZakupow = new ListaZakupow(objectOutputStream);
+        listaZakupow.fillList(list);
+        listaZakupow.showList();
+    }
+
+    public static void sendListToServer(ObjectOutputStream objectOutputStream, ArrayList<Product> list) throws IOException {
+        objectOutputStream.writeObject(list);
+        objectOutputStream.flush();
+    }
+
     private boolean hasServerFreeSlot(BufferedReader input) throws IOException {
 
         String status = input.readLine();
-        System.out.println("STATUS: " + status);
+        debug.message("Server status - " + status);
 
         return status.equalsIgnoreCase("OK");
     }
@@ -111,4 +110,5 @@ public class Client {
         System.out.println(message);
         Thread.sleep(time * 1000);
     }
+
 }

@@ -23,10 +23,10 @@ public class FileManager {
 
     }
 
-    public static boolean saveFile(ArrayList<Product> productsList) {
+    public static void saveFile(ArrayList<Product> productsList) {
 
         if (!openFile())
-            return false;
+            return;
 
         try (FileWriter myWriter = new FileWriter(FILENAME)) {
             for (Product product : productsList){
@@ -36,10 +36,10 @@ public class FileManager {
         }
         catch (IOException ignored) {
             System.out.println("Cannot to write to file!");
-            return false;
+            return;
         }
 
-        return true;
+        file = null;
     }
 
     public static ArrayList<Product> readFile(){
@@ -57,7 +57,10 @@ public class FileManager {
 
                 String[] serializedLine = product.split(";");
 
-                listOfProducts.add(new Product(serializedLine[0], serializedLine[1], serializedLine[2], serializedLine[3]));
+                try{
+                    listOfProducts.add(new Product(serializedLine[0], serializedLine[1], serializedLine[2], serializedLine[3]));
+                }
+                catch (ArrayIndexOutOfBoundsException ignore){}
 
             }
 
@@ -67,6 +70,7 @@ public class FileManager {
             return null;
         }
 
+        file = null;
         return listOfProducts;
     }
 
