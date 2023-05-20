@@ -2,13 +2,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 public class ListaZakupow extends JFrame {
 
     private final String FRAME_NAME = "Shopping List";
     private final String[] UNITS_LIST = {"szt", "kg", "litr"};
-    private final String[] CATEGORIES_LIST = {null, "Bread", "Meat", "Fruits", "Vegetables", "Sweets", "Drinks", "Chemicals"};
+    private final String[] CATEGORIES_LIST = {null, "Bread", "Meat", "Fruits", "Vegetables", "Sweets", "Drinks", "Chemicals", "Dairy"};
 
     private ArrayList<Product> allProductsList;
     private DefaultListModel<Product> displayedProductsList;
@@ -23,8 +25,11 @@ public class ListaZakupow extends JFrame {
     private JComboBox<String> unitsComboBox;
     private JComboBox<String> categoriesComboBox;
 
+    private ObjectOutputStream objectOutputStream;
 
-    public ListaZakupow() {
+    public ListaZakupow(ObjectOutputStream objectOutputStream) {
+
+        this.objectOutputStream = objectOutputStream;
 
         // Setting Up The Environment
         initializeErrorManager();
@@ -72,13 +77,26 @@ public class ListaZakupow extends JFrame {
     }
 
     public void showList() {
-        loadDataFromFile();
         showProgramWindow();
     }
 
+    public void closeList() {
+        dispose();
+    }
+
+    public void emergencyClose() {
+        InfoBox.error("Connection lost!\nApplication will be closed!");
+        dispose();
+    }
+
+
     public void fillList(ArrayList<Product> list) {
+
+        if (list == null)
+            return;
+
         for (Product product : list)
-            addNewProduct(product);
+            addNewProduct(product, false);
     }
 
 
@@ -98,18 +116,22 @@ public class ListaZakupow extends JFrame {
         panel.add(button);
     }
 
-    private void loadDataFromFile() {
 
-        allProductsList = FileManager.readFile();
+    private void sendList(ArrayList<Product> list) throws InterruptedException {
 
-        if (allProductsList == null)
-            return;
+        try {
+            Client.sendListToServer(objectOutputStream, list);
+        } catch (IOException ex) {
 
-        for (Product product : allProductsList)
-            displayedProductsList.addElement(product);
+            if (list == null){
+                closeList();
+                return;
+            }
 
+            InfoBox.error("Server not responding!\nApplication will be closed!");
+            closeList();
+        }
     }
-
 
     private void setFrameBasicFeatures() {
         setTitle(FRAME_NAME);
@@ -121,23 +143,32 @@ public class ListaZakupow extends JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
 
-                if (changesAreSaved == false) {
+                try {
+                    if (!changesAreSaved) {
 
-                    int confirm = JOptionPane.showConfirmDialog(ListaZakupow.this,
-                            "There are unsaved changes!\nDo you want do save it?",
-                            "WARNING",
-                            JOptionPane.YES_NO_OPTION);
+                        int confirm = JOptionPane.showConfirmDialog(ListaZakupow.this,
+                                "There are unsaved changes!\nDo you want do save it?",
+                                "WARNING",
+                                JOptionPane.YES_NO_OPTION);
 
-                    if (confirm == JOptionPane.YES_OPTION)
-                        FileManager.saveFile(allProductsList);
+                        switch (confirm) {
+                            case JOptionPane.YES_OPTION -> sendList(allProductsList);
+                            case JOptionPane.NO_OPTION -> sendList(null);
+                            case JOptionPane.CLOSED_OPTION -> {
+                                return;
+                            }
+                        }
 
-                    if (confirm == JOptionPane.CLOSED_OPTION)
-                        return;
+                        closeList();
 
-                    dispose();
-
-                } else
-                    dispose();
+                    } else {
+                        sendList(allProductsList);
+                        closeList();
+                    }
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                    closeList();
+                }
 
             }
         });
@@ -145,6 +176,7 @@ public class ListaZakupow extends JFrame {
 
         setSize(600, 600);
     }
+
 
     private void initializeLists() {
         allProductsList = new ArrayList<>();
@@ -283,10 +315,12 @@ public class ListaZakupow extends JFrame {
         amountField.setText("");
     }
 
-    private void addNewProduct(Product product) {
+    private void addNewProduct(Product product, boolean signalizeNewChanges) {
         allProductsList.add(product);
         displayedProductsList.addElement(product);
-        newChangesAppeared();
+
+        if (signalizeNewChanges)
+            newChangesAppeared();
     }
 
 
@@ -306,7 +340,7 @@ public class ListaZakupow extends JFrame {
             String amount = getAmount(unit);
             if (amount == null) return;
 
-            addNewProduct(new Product(name, amount, category, unit));
+            addNewProduct(new Product(name, amount, category, unit), true);
             clearTextFields();
 
         });
