@@ -339,6 +339,7 @@ public class ListaZakupow extends JFrame {
     private void clearTextFields() {
         productNameField.setText("");
         amountField.setText("");
+        categoriesComboBox.setSelectedIndex(0);
     }
 
     private void addNewProduct(Product product, boolean signalizeNewChanges) {

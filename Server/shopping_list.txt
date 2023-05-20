@@ -17,3 +17,5 @@ Bulki;3;Bread;szt
 Bagietka czosnkowa;1;Bread;szt
 Chleb razowy;1;Bread;szt
 Marchewki;6;Vegetables;szt
+Cukierki Czekoladowe;0.3;Sweets;kg
+Domestos;1;Chemicals;szt
