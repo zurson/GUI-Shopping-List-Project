@@ -13,3 +13,6 @@ Szynka wedzona;0.25;Meat;kg
 Pomidory;2;Vegetables;szt
 Ogorek;1;Vegetables;szt
 Glowka kapusty;1;Vegetables;szt
+Bulki;3;Bread;szt
+Bagietka czosnkowa;1;Bread;szt
+Chleb razowy;1;Bread;szt

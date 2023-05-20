@@ -424,10 +424,8 @@ public class ListaZakupow extends JFrame {
 
         saveButton.addActionListener(e -> {
 
-            if (FileManager.saveFile(allProductsList)) {
-                InfoBox.information("File saved successfully!");
-                changesHaveBeenSaved();
-            }
+            InfoBox.information("File saved successfully!");
+            changesHaveBeenSaved();
 
         });
 
